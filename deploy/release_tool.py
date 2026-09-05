@@ -14,7 +14,7 @@ from typing import Callable
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "deploy" / "release-manifest.json"
 AGUSTA_DOC_PATH = ROOT / "agusta-doc"
-PROJECT_REPOSITORY = "AdaptX/agusta"
+PROJECT_REPOSITORY = "VptrCipher/Agusta"
 
 KNOWN_SURFACES = {
     "cli_version",

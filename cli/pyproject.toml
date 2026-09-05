@@ -30,9 +30,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/AdaptX/agusta"
-Repository = "https://github.com/AdaptX/agusta"
-Issues = "https://github.com/AdaptX/agusta/issues"
+Homepage = "https://github.com/VptrCipher/Agusta"
+Repository = "https://github.com/VptrCipher/Agusta"
+Issues = "https://github.com/VptrCipher/Agusta/issues"
 
 [project.scripts]
 agusta = "agusta_cli.main:run"

@@ -6,10 +6,6 @@
   "releaseDocsBaseUrl": "https://docs.agusta.dev/release",
   "surfaces": [
     "cli_version",
-    "compose_env_example",
-    "quickstart_deployment_docs",
-    "quickstart_upgrade_docs",
-    "release_notes_pages",
-    "vitepress_nav"
+    "compose_env_example"
   ]
 }
