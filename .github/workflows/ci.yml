@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  release-consistency:
+    name: Release consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - run: python deploy/release_tool.py check
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: agusta
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d agusta"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DJANGO_SECRET_KEY: ci-secret-key
+      DJANGO_ALLOWED_HOSTS: "*"
+      POSTGRES_DB: agusta
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: "6379"
+      REDIS_DB: "1"
+      RUSTFS_ENDPOINT_URL: http://127.0.0.1:9000
+      RUSTFS_ACCESS_KEY: agusta
+      RUSTFS_SECRET_KEY: ci-rustfs-secret
+      RUSTFS_BUCKET: agusta
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run python manage.py check
+      - run: uv run python manage.py spectacular --file /tmp/agusta-openapi.yaml
+      - run: uv run python manage.py test
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec eslint .
+      - run: pnpm exec tsc -b
+      - run: pnpm build
+
+  compose-package:
+    name: Compose package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Render Compose config
+        working-directory: deploy/agusta-compose
+        run: |
+          trap 'rm -f .env' EXIT
+          cp .env.example .env
+          docker compose --env-file .env.example config --quiet
+      - name: Build package
+        run: bash ./deploy/package-agusta-compose.sh --version 0.0.0-ci --output-dir dist-ci
+      - name: Validate package contents
+        run: |
+          archive_path="dist-ci/agusta-compose.tar.gz"
+          test -f "$archive_path"
+          tar -tzf "$archive_path" >/dev/null
+          rm -rf dist-ci/unpacked
+          mkdir -p dist-ci/unpacked
+          tar -xzf "$archive_path" -C dist-ci/unpacked
+          test -x dist-ci/unpacked/agusta-compose/scripts/upgrade.sh
+          test -f dist-ci/unpacked/agusta-compose/scripts/doctor.sh
+          test ! -e dist-ci/unpacked/agusta-compose/.env
+          if find dist-ci/unpacked -type f | grep -E 'custom/(modules|playbooks)/.+\.py$|custom/data/(modules|siem|playbooks)/.+\.(json|ya?ml|md)$'; then
+            echo "Release custom template contains development samples." >&2
+            exit 1
+          fi

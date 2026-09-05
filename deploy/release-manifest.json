@@ -1,0 +1,15 @@
+{
+  "version": "0.5.2",
+  "title": "When all is darkest",
+  "previousVersion": "0.5.1",
+  "releaseDocSlug": "0_5_2_When_all_is_darkest",
+  "releaseDocsBaseUrl": "https://docs.agusta.dev/release",
+  "surfaces": [
+    "cli_version",
+    "compose_env_example",
+    "quickstart_deployment_docs",
+    "quickstart_upgrade_docs",
+    "release_notes_pages",
+    "vitepress_nav"
+  ]
+}

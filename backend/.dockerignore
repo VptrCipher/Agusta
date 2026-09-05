@@ -1,0 +1,23 @@
+.venv
+__pycache__
+*.pyc
+.env
+staticfiles
+logs
+
+# `custom` is the operator overlay. In a deployment it is a bind-mounted volume,
+# so anything baked in here would be shadowed anyway. Official Modules,
+# Playbooks and SIEM index definitions ship separately and DO reach the image:
+#   modules/            official detection Modules
+#   playbooks/          official Playbooks
+#   data/siem/          official SIEM index schemas
+#   data/modules/       sample payloads for each Module
+#   data/playbooks/     prompts for official Playbooks
+custom
+
+# Development-only mock data importer and SIEM log simulator. Superseded in
+# deployments by `manage.py seed_demo_data`, which ships under apps/common/demo.
+mock
+
+# Local test harnesses.
+_verify_*.py

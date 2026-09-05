@@ -1,0 +1,447 @@
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono/JetBrainsMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * AGUSTA design tokens.
+ * Mirrors frontend/src/palette.ts - keep the two in sync.
+ */
+:root {
+  --agusta-bg-base: #1b1a19;
+  --agusta-bg-layout: #201f1d;
+  --agusta-bg-container: #262422;
+  --agusta-bg-elevated: #2e2c29;
+  --agusta-bg-well: #161514;
+
+  --agusta-border: #35322e;
+  --agusta-border-soft: #2b2825;
+  --agusta-border-strong: #433f3a;
+
+  --agusta-text: #f0eee7;
+  --agusta-text-secondary: #b9b4aa;
+  --agusta-text-tertiary: #8c877d;
+  --agusta-text-quaternary: #6b665e;
+
+  --agusta-primary: #d97757;
+  --agusta-primary-hover: #e28d70;
+  --agusta-primary-active: #c2603f;
+  --agusta-primary-rgb: 217, 119, 87;
+
+  --agusta-success: #85a96f;
+  --agusta-warning: #d9a344;
+  --agusta-error: #c75b52;
+  --agusta-info: #8fa8bf;
+  --agusta-brass: #c8a35c;
+
+  /* Warm paper white, used for every translucent light overlay. */
+  --agusta-paper-rgb: 240, 238, 231;
+
+  --agusta-radius-sm: 6px;
+  --agusta-radius-md: 10px;
+  --agusta-radius-lg: 14px;
+  --agusta-radius-xl: 20px;
+
+  --agusta-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.24), 0 8px 24px rgba(0, 0, 0, 0.18);
+  --agusta-shadow-raised: 0 12px 32px rgba(0, 0, 0, 0.34);
+  --agusta-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.48);
+
+  --agusta-font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Times New Roman', Georgia, serif;
+  --agusta-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, 'Courier New', monospace;
+
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-size: 14px;
+  line-height: 1.5715;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--agusta-bg-base);
+  color: var(--agusta-text);
+}
+
+::selection {
+  background: rgba(var(--agusta-primary-rgb), 0.28);
+}
+
+:focus-visible {
+  outline: 2px solid var(--agusta-primary);
+  outline-offset: 2px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+.ant-input:-webkit-autofill,
+.ant-input:-webkit-autofill:hover,
+.ant-input:-webkit-autofill:focus,
+.ant-input:-webkit-autofill:active,
+.ant-input-affix-wrapper input:-webkit-autofill,
+.ant-input-affix-wrapper input:-webkit-autofill:hover,
+.ant-input-affix-wrapper input:-webkit-autofill:focus,
+.ant-input-affix-wrapper input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--agusta-bg-well) inset !important;
+  -webkit-text-fill-color: var(--agusta-text) !important;
+  caret-color: var(--agusta-text);
+  transition: background-color 9999s ease-out, color 9999s ease-out;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-track-piece,
+*::-webkit-scrollbar-track-piece:start,
+*::-webkit-scrollbar-track-piece:end {
+  background: transparent;
+  border: 0;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(var(--agusta-paper-rgb), 0.18);
+  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--agusta-primary-rgb), 0.42);
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.ant-table .ant-table-body,
+.ant-table .ant-table-content {
+  scrollbar-width: none;
+}
+
+.ant-table .ant-table-body::-webkit-scrollbar,
+.ant-table .ant-table-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.ant-table .ant-table-body::-webkit-scrollbar-track,
+.ant-table .ant-table-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ant-table .ant-table-body::-webkit-scrollbar-thumb,
+.ant-table .ant-table-content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border: 0;
+}
+
+.ant-table .ant-table-body::-webkit-scrollbar-thumb:hover,
+.ant-table .ant-table-content::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+.agusta-data-table .ant-table-body {
+  min-height: var(--agusta-table-body-height);
+}
+
+.agusta-table-floating-help {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  opacity: 0.72;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.agusta-table-floating-help:hover,
+.agusta-table-floating-help:focus {
+  opacity: 1;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.36);
+}
+
+.avatar-upload-trigger {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar-upload-trigger-disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.avatar-upload-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.avatar-upload-trigger:hover .avatar-upload-mask {
+  opacity: 1;
+}
+
+.personal-modal-tabs {
+  margin-top: -12px;
+}
+
+.personal-modal-tabs > .ant-tabs-nav {
+  padding-right: 40px;
+}
+
+.record-detail-modal {
+  max-width: none;
+  padding-bottom: 0;
+}
+
+.message-attachment-card-remove {
+  opacity: 0;
+}
+
+.message-attachment-card:hover .message-attachment-card-remove {
+  opacity: 1;
+}
+
+.system-settings-tabs,
+.system-settings-tabs .ant-tabs-content-holder,
+.system-settings-tabs .ant-tabs-content,
+.system-settings-tabs .ant-tabs-tabpane {
+  min-height: 0;
+  height: 100%;
+}
+
+.system-settings-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-row-actions .ant-btn .anticon {
+  font-size: 16px;
+}
+
+.system-settings-tabs .ant-tabs-content-holder {
+  flex: 1;
+  overflow: hidden;
+}
+
+.agusta-markdown-preview .w-md-editor-preview,
+.agusta-markdown-preview .wmde-markdown,
+.agusta-markdown-preview .wmde-markdown-var {
+  background: transparent !important;
+}
+
+.agusta-markdown-preview .w-md-editor {
+  background: transparent !important;
+}
+
+.agusta-markdown-preview .w-md-editor-content,
+.agusta-markdown-preview .w-md-editor-area {
+  background: transparent !important;
+}
+
+.agusta-markdown-preview .w-md-editor-preview,
+.agusta-markdown-preview .wmde-markdown,
+.agusta-markdown-preview .wmde-markdown-var {
+  background: transparent !important;
+}
+
+.agusta-markdown-preview .wmde-markdown,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.agusta-markdown-preview .wmde-markdown h1,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown h1 {
+  margin: 0.45em 0 0.35em;
+  padding-bottom: 0;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.agusta-markdown-preview .wmde-markdown h2,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown h2 {
+  margin: 0.45em 0 0.35em;
+  padding-bottom: 0;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.agusta-markdown-preview .wmde-markdown h3,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown h3 {
+  margin: 0.4em 0 0.3em;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.agusta-markdown-preview .wmde-markdown h4,
+.agusta-markdown-preview .wmde-markdown h5,
+.agusta-markdown-preview .wmde-markdown h6,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown h4,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown h5,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown h6 {
+  margin: 0.35em 0 0.25em;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.agusta-markdown-preview .wmde-markdown p,
+.agusta-markdown-preview .wmde-markdown blockquote,
+.agusta-markdown-preview .wmde-markdown ul,
+.agusta-markdown-preview .wmde-markdown ol,
+.agusta-markdown-preview .wmde-markdown dl,
+.agusta-markdown-preview .wmde-markdown table,
+.agusta-markdown-preview .wmde-markdown pre,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown p,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown blockquote,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown ul,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown ol,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown dl,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown table,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown pre {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.agusta-markdown-preview .wmde-markdown ul,
+.agusta-markdown-preview .wmde-markdown ol,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown ul,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown ol {
+  padding-left: 1.4em;
+}
+
+.agusta-markdown-preview .wmde-markdown blockquote,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown blockquote {
+  padding: 0 0 0 10px;
+}
+
+.agusta-markdown-preview .wmde-markdown pre,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown pre {
+  padding: 10px;
+  font-size: 13px;
+}
+
+.agusta-markdown-preview .wmde-markdown code,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown code {
+  font-size: 13px;
+}
+
+.agusta-markdown-preview .wmde-markdown table th,
+.agusta-markdown-preview .wmde-markdown table td,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown table th,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown table td {
+  padding: 4px 8px;
+}
+
+.agusta-markdown-preview .wmde-markdown img,
+.agusta-markdown-preview .w-md-editor-preview .wmde-markdown img {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------------------------
+ * AGUSTA refinements
+ * Small, global polish that Ant Design tokens cannot express on their own.
+ * ------------------------------------------------------------------------- */
+
+/* Structural chrome sits on hairlines rather than heavy 1px greys. */
+.ant-layout-sider,
+.ant-layout-header {
+  border-color: var(--agusta-border-soft) !important;
+}
+
+/* Navigation: quiet by default, accent only on the active item. */
+.ant-menu-inline .ant-menu-item {
+  margin-block: 2px;
+  font-weight: 450;
+}
+
+.ant-menu-inline .ant-menu-item-selected {
+  font-weight: 550;
+}
+
+/* Table headers read as labels, not shouting captions. */
+.ant-table-thead > tr > th {
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Cards get a single hairline and a soft lift instead of a glow. */
+.ant-card {
+  border-color: var(--agusta-border);
+}
+
+/* Buttons: flat, no gradient sheen. */
+.ant-btn {
+  box-shadow: none !important;
+}
+
+.ant-btn-primary {
+  font-weight: 550;
+}
+
+/* Serif display treatment for modal and drawer titles. */
+.ant-modal-title,
+.ant-drawer-title {
+  font-family: var(--agusta-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* Code and identifiers keep the mono face on a warm well. */
+.ant-typography code,
+.ant-typography kbd {
+  background: var(--agusta-bg-well);
+  border-color: var(--agusta-border-soft);
+  font-family: var(--agusta-font-mono);
+}
+
+.agusta-comfortable-tag {
+  font-weight: 500;
+}

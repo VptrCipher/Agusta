@@ -1,0 +1,17 @@
+#!/bin/sh
+
+agusta_web_timeout="${AGUSTA_WEB_TIMEOUT:-210}"
+case "$agusta_web_timeout" in
+    ''|*[!0-9]*)
+        echo "AGUSTA_WEB_TIMEOUT must be a positive integer." >&2
+        exit 1
+        ;;
+esac
+
+if [ "$agusta_web_timeout" -le 0 ]; then
+    echo "AGUSTA_WEB_TIMEOUT must be a positive integer." >&2
+    exit 1
+fi
+
+export AGUSTA_NGINX_PROXY_TIMEOUT="$((agusta_web_timeout + 5))s"
+export AGUSTA_MAX_UPLOAD_SIZE="${AGUSTA_MAX_UPLOAD_SIZE:-20m}"

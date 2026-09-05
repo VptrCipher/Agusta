@@ -1,0 +1,186 @@
+x-agusta-backend: &agusta-backend
+  image: ${AGUSTA_BACKEND_IMAGE}
+  env_file:
+    - .env
+  environment:
+    PYTHONPATH: /opt/agusta/custom-packages:/app/custom
+  volumes:
+    - ./custom:/app/custom
+    - ./scripts:/opt/agusta/scripts:ro
+    - ./logs:/app/log
+    - custom-python-packages:/opt/agusta/custom-packages
+    - static-files:/app/staticfiles
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis-stack:
+      condition: service_healthy
+    rustfs:
+      condition: service_started
+
+services:
+  agusta-frontend:
+    image: ${AGUSTA_FRONTEND_IMAGE}
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${AGUSTA_BIND:-0.0.0.0}:${AGUSTA_HTTPS_PORT:-443}:443"
+    volumes:
+      - static-files:/usr/share/nginx/backend-static:ro
+      - ./certs:/etc/nginx/certs
+      - ./logs/nginx:/var/log/agusta/nginx
+    depends_on:
+      agusta-web:
+        condition: service_healthy
+      agusta-asgi:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-check-certificate -qO- https://127.0.0.1/ >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  agusta-web:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command:
+      - gunicorn
+      - agusta.wsgi:application
+      - --bind
+      - 0.0.0.0:8000
+      - --worker-class
+      - gthread
+      - --workers
+      - "${AGUSTA_WEB_WORKERS:-3}"
+      - --threads
+      - "${AGUSTA_WEB_THREADS:-4}"
+      - --timeout
+      - "${AGUSTA_WEB_TIMEOUT:-210}"
+      - --graceful-timeout
+      - "60"
+      - --keep-alive
+      - "${AGUSTA_WEB_KEEPALIVE:-5}"
+      - --max-requests
+      - "${AGUSTA_WEB_MAX_REQUESTS:-1000}"
+      - --max-requests-jitter
+      - "${AGUSTA_WEB_MAX_REQUESTS_JITTER:-100}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/api/health/ >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  agusta-asgi:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command: ["uvicorn", "agusta.asgi:application", "--host", "0.0.0.0", "--port", "8001"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8001/api/health/ >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  agusta-worker-module:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command: ["python", "manage.py", "run_agentic_module_worker"]
+
+  agusta-worker-case-analysis:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command: ["python", "manage.py", "run_agentic_case_analysis_worker"]
+
+  agusta-worker-playbook:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command: ["python", "manage.py", "run_agentic_playbook_worker"]
+
+  agusta-worker-elk-action:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command: ["python", "manage.py", "run_elk_action_worker"]
+
+  agusta-worker-dashboard-cache:
+    <<: *agusta-backend
+    restart: unless-stopped
+    command: ["python", "manage.py", "run_dashboard_cache_worker"]
+
+  agusta-migrate:
+    <<: *agusta-backend
+    restart: "no"
+    entrypoint: ["/opt/agusta/scripts/container-init.sh"]
+
+  agusta-custom-deps:
+    <<: *agusta-backend
+    restart: "no"
+    entrypoint: ["/opt/agusta/scripts/install-custom-deps.sh"]
+    depends_on: []
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    shm_size: "1gb"
+    command:
+      - postgres
+      - -c
+      - max_connections=${POSTGRES_MAX_CONNECTIONS:-150}
+      - -c
+      - shared_buffers=${POSTGRES_SHARED_BUFFERS:-512MB}
+      - -c
+      - effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-2GB}
+      - -c
+      - work_mem=${POSTGRES_WORK_MEM:-8MB}
+      - -c
+      - maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-256MB}
+      - -c
+      - checkpoint_completion_target=${POSTGRES_CHECKPOINT_COMPLETION_TARGET:-0.9}
+      - -c
+      - random_page_cost=${POSTGRES_RANDOM_PAGE_COST:-1.1}
+      - -c
+      - log_min_duration_statement=${POSTGRES_LOG_MIN_DURATION_STATEMENT:-1000}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis-stack:
+    image: redis/redis-stack:latest
+    restart: unless-stopped
+    ports:
+      - "${AGUSTA_MANAGEMENT_BIND:-0.0.0.0}:${AGUSTA_REDIS_UI_PORT:-8001}:8001"
+    environment:
+      REDIS_ARGS: --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    restart: unless-stopped
+    ports:
+      - "${AGUSTA_MANAGEMENT_BIND:-0.0.0.0}:${AGUSTA_RUSTFS_CONSOLE_PORT:-9001}:9001"
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY}
+    volumes:
+      - rustfs-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
+  rustfs-data:
+  custom-python-packages:
+  static-files:

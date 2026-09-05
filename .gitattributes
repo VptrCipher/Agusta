@@ -1,0 +1,36 @@
+* text=auto eol=lf
+
+# Shell scripts and container entrypoints must keep LF endings or they fail
+# inside Linux containers when cloned on Windows.
+*.sh text eol=lf
+*.envsh text eol=lf
+Dockerfile text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Windows-only scripts keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets: never diff or convert.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg text
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.zip binary
+*.gz binary
+*.tar binary
+
+# Lockfiles: collapse diff noise in reviews.
+uv.lock -diff
+pnpm-lock.yaml -diff
+package-lock.json -diff

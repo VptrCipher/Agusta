@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: agusta-dev-postgres
+    restart: unless-stopped
+    shm_size: "1gb"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-agusta}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agusta-dev-postgres-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-agusta}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis-stack:
+    image: redis/redis-stack:latest
+    container_name: agusta-dev-redis-stack
+    restart: unless-stopped
+    environment:
+      REDIS_ARGS: --requirepass ${REDIS_PASSWORD:-agusta-dev-redis-password}
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD:-agusta-dev-redis-password} ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: agusta-dev-rustfs
+    restart: unless-stopped
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-agusta}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-agusta-dev-rustfs-password}
+      RUSTFS_DEFAULT_REGION: ${RUSTFS_REGION:-us-east-1}
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - rustfs-data:/data
+      - rustfs-logs:/logs
+
+volumes:
+  postgres-data:
+  redis-data:
+  rustfs-data:
+  rustfs-logs:

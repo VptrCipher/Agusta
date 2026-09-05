@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+.venv/
+
+# Django
+*.sqlite3
+media/
+staticfiles/
+backend/perf-results/
+
+# Environment
+.env
+.env.local
+/deploy/agusta-compose/compose.override.yaml
+
+# Secrets: TLS keys and certificates must never be committed
+certs/
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+
+# Runtime logs (may contain tokens, org identifiers and telemetry)
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node
+node_modules/
+
+# Local git worktrees
+.worktrees/
+
+# Separately-hosted documentation and marketplace repositories
+/asp-doc/
+/asp-marketplace/
+/agusta-doc/
+/agusta-marketplace/
+
+# OS
+.DS_Store
+Thumbs.db
+
+.claude/*
+.agusta/
